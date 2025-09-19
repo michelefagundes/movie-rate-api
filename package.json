@@ -2,17 +2,23 @@
   "name": "movie-rate-api",
   "version": "1.0.0",
   "main": "src/index.js",
-  "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "test": "mocha test/controllers/*.js test/external/*.js"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.0.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.1",
     "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "chai": "^6.0.1",
+    "mocha": "^11.7.2",
+    "sinon": "^21.0.0",
+    "supertest": "^7.1.4"
   }
 }

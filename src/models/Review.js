@@ -7,6 +7,5 @@ const reviewSchema = new mongoose.Schema({
   comment: { type: String },
 }, { timestamps: true });
 
-reviewSchema.index({ user: 1, movie: 1 }, { unique: true }); // Prevent duplicate reviews
-
+reviewSchema.index({ user: 1, movie: 1 }, { unique: true }); 
 export default mongoose.model('Review', reviewSchema);

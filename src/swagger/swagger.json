@@ -3,220 +3,236 @@
   "info": {
     "title": "Media Rate API",
     "version": "1.0.0",
-    "description": "Simple API for rating movies and series with authentication."
+    "description": "API for user registration, login, media management, and reviews. JWT authentication required for protected endpoints."
   },
   "paths": {
-    "/api/auth/register": {
-      "post": {
-        "summary": "Register a new user",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": { "type": "string" },
-                  "password": { "type": "string" }
-                },
-                "required": ["username", "password"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": { "description": "User registered" },
-          "400": { "description": "User already exists" }
-        }
-      }
-    },
-    "/api/auth/login": {
-      "post": {
-        "summary": "Login user",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": { "type": "string" },
-                  "password": { "type": "string" }
-                },
-                "required": ["username", "password"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "JWT token returned" },
-          "400": { "description": "Invalid credentials" }
-        }
-      }
-    },
-    "/api/movies": {
-      "get": {
-        "summary": "Get all medias (with filters)",
-        "parameters": [
-          { "name": "genre", "in": "query", "schema": { "type": "string" } },
-          { "name": "releaseDate", "in": "query", "schema": { "type": "string", "format": "date" } },
-          { "name": "minRating", "in": "query", "schema": { "type": "number" } },
-          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["movie", "serie"] } }
-        ],
-        "responses": {
-          "200": { "description": "List of medias" }
-        }
-      },
-      "post": {
-        "summary": "Create a media (movie or serie)",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "title": { "type": "string" },
-                  "genre": { "type": "string" },
-                  "releaseDate": { "type": "string", "format": "date" },
-                  "type": { "type": "string", "enum": ["movie", "serie"] }
-                },
-                "required": ["title", "genre", "releaseDate", "type"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": { "description": "Media created" }
-        }
-      }
-    },
-    "/api/movies/{id}": {
-      "get": {
-        "summary": "Get a media by ID",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Media details" },
-          "404": { "description": "Media not found" }
-        }
-      },
-      "put": {
-        "summary": "Update a media",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "title": { "type": "string" },
-                  "genre": { "type": "string" },
-                  "releaseDate": { "type": "string", "format": "date" },
-                  "type": { "type": "string", "enum": ["movie", "serie"] }
+      "/users/register": {
+        "post": {
+          "summary": "Register a new user",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": { "type": "string" },
+                    "password": { "type": "string" }
+                  },
+                  "required": ["username", "password"]
                 }
               }
             }
+          },
+          "responses": {
+            "201": { "description": "User created" },
+            "400": { "description": "Validation error or user already exists" }
           }
-        },
-        "responses": {
-          "200": { "description": "Media updated" },
-          "404": { "description": "Media not found" }
         }
       },
-      "delete": {
-        "summary": "Delete a media",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Media deleted" },
-          "404": { "description": "Media not found" }
-        }
-      }
-    },
-    "/api/reviews": {
-      "post": {
-        "summary": "Create a review (JWT required)",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "movie": { "type": "string" },
-                  "rating": { "type": "number" },
-                  "comment": { "type": "string" }
-                },
-                "required": ["movie", "rating"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": { "description": "Review created" },
-          "400": { "description": "Duplicate review or error" }
-        }
-      }
-    },
-    "/api/reviews/movie/{movieId}": {
-      "get": {
-        "summary": "Get all reviews for a media",
-        "parameters": [
-          { "name": "movieId", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "List of reviews" }
-        }
-      }
-    },
-    "/api/reviews/user": {
-      "get": {
-        "summary": "Get all reviews by the logged-in user (JWT required)",
-        "responses": {
-          "200": { "description": "List of reviews" }
-        }
-      }
-    },
-    "/api/reviews/{id}": {
-      "put": {
-        "summary": "Update a review (JWT required)",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "rating": { "type": "number" },
-                  "comment": { "type": "string" }
+      "/users/login": {
+        "post": {
+          "summary": "User login",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": { "type": "string" },
+                    "password": { "type": "string" }
+                  },
+                  "required": ["username", "password"]
                 }
               }
             }
+          },
+          "responses": {
+            "200": { "description": "Login successful" },
+            "400": { "description": "Invalid username or password" }
           }
-        },
-        "responses": {
-          "200": { "description": "Review updated" },
-          "404": { "description": "Review not found" }
         }
       },
-      "delete": {
-        "summary": "Delete a review (JWT required)",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Review deleted" },
-          "404": { "description": "Review not found" }
+      "/medias": {
+        "get": {
+          "summary": "List all medias (with filters)",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "genre", "in": "query", "schema": { "type": "string" } },
+            { "name": "releaseDate", "in": "query", "schema": { "type": "string", "format": "date" } },
+            { "name": "minRating", "in": "query", "schema": { "type": "number" } },
+            { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["movie", "serie"] } }
+          ],
+          "responses": {
+            "200": { "description": "List of medias" },
+            "401": { "description": "JWT token missing or invalid" }
+          }
+        },
+        "post": {
+          "summary": "Create a media (movie or serie)",
+          "security": [{ "bearerAuth": [] }],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": { "type": "string" },
+                    "genre": { "type": "string" },
+                    "releaseDate": { "type": "string", "format": "date" },
+                    "type": { "type": "string", "enum": ["movie", "serie"] }
+                  },
+                  "required": ["title", "genre", "releaseDate", "type"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": { "description": "Media created" },
+            "401": { "description": "JWT token missing or invalid" }
+          }
         }
+      },
+      "/medias/{id}": {
+        "get": {
+          "summary": "Get media by ID",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "responses": {
+            "200": { "description": "Media details" },
+            "404": { "description": "Media not found" },
+            "401": { "description": "JWT token missing or invalid" }
+          }
+        },
+        "put": {
+          "summary": "Update media",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": { "type": "string" },
+                    "genre": { "type": "string" },
+                    "releaseDate": { "type": "string", "format": "date" },
+                    "type": { "type": "string", "enum": ["movie", "serie"] }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": { "description": "Media updated" },
+            "404": { "description": "Media not found" },
+            "401": { "description": "JWT token missing or invalid" }
+          }
+        },
+        "delete": {
+          "summary": "Delete media",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "responses": {
+            "200": { "description": "Media deleted" },
+            "404": { "description": "Media not found" },
+            "401": { "description": "JWT token missing or invalid" }
+          }
+        },
+        "post": {
+          "summary": "Create a review for a media",
+          "security": [{ "bearerAuth": [] }],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rating": { "type": "number" },
+                    "comment": { "type": "string" }
+                  },
+                  "required": ["rating", "comment"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": { "description": "Review created" },
+            "400": { "description": "Duplicate review or error" },
+            "401": { "description": "JWT token missing or invalid" }
+          }
+        }
+      },
+      "/api/reviews/movie/{movieId}": {
+        "get": {
+          "summary": "List all reviews for a media",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "movieId", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "responses": {
+            "200": { "description": "List of reviews" },
+            "401": { "description": "JWT token missing or invalid" }
+          }
+        }
+      },
+      "/api/reviews/{id}": {
+        "put": {
+          "summary": "Update a review",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rating": { "type": "number" },
+                    "comment": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": { "description": "Review updated" },
+            "404": { "description": "Review not found" },
+            "401": { "description": "JWT token missing or invalid" }
+          }
+        },
+        "delete": {
+          "summary": "Delete a review",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "responses": {
+            "200": { "description": "Review deleted" },
+            "404": { "description": "Review not found" },
+            "401": { "description": "JWT token missing or invalid" }
+          }
+        }
+      }
+    },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }

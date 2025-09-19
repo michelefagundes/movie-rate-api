@@ -5,7 +5,6 @@ import auth from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Create review (prevent duplicate)
 router.post('/', auth, async (req, res) => {
   const { movie, rating, comment } = req.body;
   try {
@@ -19,7 +18,6 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// Get all reviews for a movie
 router.get('/movie/:movieId', async (req, res) => {
   try {
     const reviews = await Review.find({ movie: req.params.movieId }).populate('user', 'username');
@@ -29,7 +27,6 @@ router.get('/movie/:movieId', async (req, res) => {
   }
 });
 
-// Get user's reviews
 router.get('/user', auth, async (req, res) => {
   try {
     const reviews = await Review.find({ user: req.user.id }).populate('movie', 'title');
@@ -39,7 +36,6 @@ router.get('/user', auth, async (req, res) => {
   }
 });
 
-// Update review
 router.put('/:id', auth, async (req, res) => {
   try {
     const review = await Review.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, req.body, { new: true });
@@ -50,7 +46,6 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-// Delete review
 router.delete('/:id', auth, async (req, res) => {
   try {
     const review = await Review.findOneAndDelete({ _id: req.params.id, user: req.user.id });
