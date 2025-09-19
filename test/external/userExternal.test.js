@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const request = require('supertest');
+const app = require('../../src/app');
 
 describe('User External', () => {
   beforeEach(() => {
@@ -8,7 +9,7 @@ describe('User External', () => {
 
   it('should register a new user', async () => {
     const user = 'user_' + Date.now();
-    const res = await request('http://localhost:3000')
+    const res = await request(app)
       .post('/users/register')
       .send({ username: user, password: '123456' });
     expect(res.status).to.equal(201);
@@ -16,20 +17,20 @@ describe('User External', () => {
   });
 
   it('should not register duplicate user', async () => {
-    await request('http://localhost:3000')
+    await request(app)
       .post('/users/register')
       .send({ username: 'externaluser', password: '123456' });
-    const res = await request('http://localhost:3000')
+    const res = await request(app)
       .post('/users/register')
       .send({ username: 'externaluser', password: '123456' });
     expect(res.status).to.equal(400);
   });
 
   it('should login with valid credentials', async () => {
-    await request('http://localhost:3000')
+    await request(app)
       .post('/users/register')
       .send({ username: 'loginuser', password: '123456' });
-    const res = await request('http://localhost:3000')
+    const res = await request(app)
       .post('/users/login')
       .send({ username: 'loginuser', password: '123456' });
     expect(res.status).to.equal(200);
@@ -37,7 +38,7 @@ describe('User External', () => {
   });
 
   it('should not allow unauthenticated user to create media', async () => {
-    const res = await request('http://localhost:3000')
+    const res = await request(app)
       .post('/medias')
       .send({
         title: 'Rio',

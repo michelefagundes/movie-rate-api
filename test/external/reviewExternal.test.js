@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const request = require('supertest');
+const app = require('../../src/app');
 
 describe('Review External', () => {
   let token;
@@ -7,14 +8,14 @@ describe('Review External', () => {
   beforeEach(async () => {
     require('../../src/model/userModel').users.length = 0;
     require('../../src/model/mediaModel').medias.length = 0;
-    await request('http://localhost:3000')
+    await request(app)
       .post('/users/register')
       .send({ username: 'reviewuser', password: '123456' });
-    const loginRes = await request('http://localhost:3000')
+    const loginRes = await request(app)
       .post('/users/login')
       .send({ username: 'reviewuser', password: '123456' });
     token = loginRes.body.token;
-    const mediaRes = await request('http://localhost:3000')
+    const mediaRes = await request(app)
       .post('/medias')
       .set('Authorization', `Bearer ${token}`)
       .send({
@@ -28,15 +29,15 @@ describe('Review External', () => {
 
 
     it('should not allow duplicate media titles', async () => {
-      await request('http://localhost:3000')
+      await request(app)
         .post('/users/register')
         .send({ username: 'test.user', password: '123456' });
-      const loginRes = await request('http://localhost:3000')
+      const loginRes = await request(app)
         .post('/users/login')
         .send({ username: 'test.user', password: '123456' });
       const userToken = loginRes.body.token;
 
-      await request('http://localhost:3000')
+      await request(app)
         .post('/medias')
         .set('Authorization', `Bearer ${userToken}`)
         .send({
@@ -45,7 +46,7 @@ describe('Review External', () => {
           releaseDate: '2020-10-11',
           type: 'movie'
         });
-      const secondReview = await request('http://localhost:3000')
+      const secondReview = await request(app)
         .post('/medias')
         .set('Authorization', `Bearer ${userToken}`)
         .send({

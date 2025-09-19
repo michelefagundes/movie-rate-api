@@ -11,14 +11,15 @@ describe('Media Service', () => {
   beforeEach(async () => {
       users.length = 0;
       medias.length = 0;
-      await request('http://localhost:3000')
+      const app = require('../../src/app');
+      await request(app)
         .post('/users/register')
         .send({ username: 'michele', password: '123456' });
-      const responseLogin = await request('http://localhost:3000')
+      const responseLogin = await request(app)
         .post('/users/login')
         .send({ username: 'michele', password: '123456' });
       token = responseLogin.body.token;
-      const mediaResponse = await request('http://localhost:3000')
+      const mediaResponse = await request(app)
         .post('/medias')
         .set('Authorization', `Bearer ${token}`)
         .send({

@@ -1,3 +1,4 @@
+process.env.JWT_SECRET = 'secretdemo';
 const request = require('supertest');
 const { expect } = require('chai');
 const app = require('../../src/app');
