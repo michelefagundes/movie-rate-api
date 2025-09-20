@@ -20,7 +20,7 @@ router.post('/login', (req, res) => {
   if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
   try {
     const user = userService.loginUser({ username, password });
-    const token = jwt.sign({ username: user.username }, SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ username: user.username }, SECRET, { expiresIn: '2h' });
     res.json({ user, token });
   } catch (err) {
     res.status(400).json({ error: err.message });

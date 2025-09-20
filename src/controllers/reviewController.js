@@ -1,51 +1,53 @@
-import Review from '../models/Review.js';
-import Movie from '../models/Movie.js';
+const { reviews } = require('../../model/reviewModel');
+const { medias } = require('../../model/mediaModel');
 
-export const createReview = async (req, res) => {
+export const createReview = (req, res) => {
   const { movie, rating, comment } = req.body;
   try {
-    const existing = await Review.findOne({ user: req.user.id, movie });
+    const existing = reviews.find(r => r.user === req.user.id && r.movie === movie);
     if (existing) return res.status(400).json({ message: 'You already reviewed this movie' });
-    const review = new Review({ user: req.user.id, movie, rating, comment });
-    await review.save();
+    const review = { id: reviews.length + 1, user: req.user.id, movie, rating, comment };
+    reviews.push(review);
     res.status(201).json(review);
   } catch (err) {
     res.status(400).json({ message: 'Error creating review' });
   }
 };
 
-export const getMovieReviews = async (req, res) => {
+export const getMovieReviews = (req, res) => {
   try {
-    const reviews = await Review.find({ movie: req.params.movieId }).populate('user', 'username');
-    res.json(reviews);
+    const movieReviews = reviews.filter(r => r.movie === Number(req.params.movieId));
+    res.json(movieReviews);
   } catch (err) {
     res.status(400).json({ message: 'Error fetching reviews' });
   }
 };
 
-export const getUserReviews = async (req, res) => {
+export const getUserReviews = (req, res) => {
   try {
-    const reviews = await Review.find({ user: req.user.id }).populate('movie', 'title');
-    res.json(reviews);
+    const userReviews = reviews.filter(r => r.user === req.user.id);
+    res.json(userReviews);
   } catch (err) {
     res.status(400).json({ message: 'Error fetching reviews' });
   }
 };
 
-export const updateReview = async (req, res) => {
+export const updateReview = (req, res) => {
   try {
-    const review = await Review.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, req.body, { new: true });
+    const review = reviews.find(r => r.id === Number(req.params.id) && r.user === req.user.id);
     if (!review) return res.status(404).json({ message: 'Review not found' });
+    Object.assign(review, req.body);
     res.json(review);
   } catch (err) {
     res.status(400).json({ message: 'Error updating review' });
   }
 };
 
-export const deleteReview = async (req, res) => {
+export const deleteReview = (req, res) => {
   try {
-    const review = await Review.findOneAndDelete({ _id: req.params.id, user: req.user.id });
-    if (!review) return res.status(404).json({ message: 'Review not found' });
+    const idx = reviews.findIndex(r => r.id === Number(req.params.id) && r.user === req.user.id);
+    if (idx === -1) return res.status(404).json({ message: 'Review not found' });
+    reviews.splice(idx, 1);
     res.json({ message: 'Review deleted' });
   } catch (err) {
     res.status(400).json({ message: 'Error deleting review' });

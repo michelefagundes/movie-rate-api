@@ -147,31 +147,7 @@
             "404": { "description": "Media not found" },
             "401": { "description": "JWT token missing or invalid" }
           }
-        },
-        "post": {
-          "summary": "Create a review for a media",
-          "security": [{ "bearerAuth": [] }],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "rating": { "type": "number" },
-                    "comment": { "type": "string" }
-                  },
-                  "required": ["rating", "comment"]
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": { "description": "Review created" },
-            "400": { "description": "Duplicate review or error" },
-            "401": { "description": "JWT token missing or invalid" }
-          }
-        }
+  }
       },
       "/api/reviews/movie/{movieId}": {
         "get": {

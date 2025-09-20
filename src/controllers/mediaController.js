@@ -24,8 +24,8 @@ router.post('/medias', authMiddleware, (req, res) => {
   if (!title || !genre || !releaseDate || !type) {
     return res.status(400).json({ error: 'All fields are required' });
   }
-  // Check for duplicate title
-  const { medias } = require('../model/mediaModel');
+
+  const { medias } = require('../model/mediaModel'); // já está correto, pois está usando src/model/mediaModel.js
   if (medias.find(m => m.title === title)) {
     return res.status(400).json({ message: 'Media with this title already exists' });
   }
@@ -51,7 +51,7 @@ router.post('/medias/:id/review', authMiddleware, (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-// List all reviews of a media
+
 router.get('/medias/:id/reviews', authMiddleware, (req, res) => {
   const { medias } = require('../model/mediaModel');
   const media = medias.find(m => m.id === Number(req.params.id));

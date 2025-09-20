@@ -1,55 +1,56 @@
 import express from 'express';
-import Review from '../models/Review.js';
-import Media from '../models/Movie.js';
-import auth from '../middleware/auth.js';
+const { reviews } = require('../model/reviewModel');
+const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, (req, res) => {
   const { movie, rating, comment } = req.body;
   try {
-    const existing = await Review.findOne({ user: req.user.id, movie });
+    const existing = reviews.find(r => r.user === req.user.id && r.movie === movie);
     if (existing) return res.status(400).json({ message: 'You already reviewed this movie' });
-    const review = new Review({ user: req.user.id, movie, rating, comment });
-    await review.save();
+    const review = { id: reviews.length + 1, user: req.user.id, movie, rating, comment };
+    reviews.push(review);
     res.status(201).json(review);
   } catch (err) {
     res.status(400).json({ message: 'Error creating review' });
   }
 });
 
-router.get('/movie/:movieId', async (req, res) => {
+router.get('/movie/:movieId', (req, res) => {
   try {
-    const reviews = await Review.find({ movie: req.params.movieId }).populate('user', 'username');
-    res.json(reviews);
+    const movieReviews = reviews.filter(r => r.movie === Number(req.params.movieId));
+    res.json(movieReviews);
   } catch (err) {
     res.status(400).json({ message: 'Error fetching reviews' });
   }
 });
 
-router.get('/user', auth, async (req, res) => {
+router.get('/user', auth, (req, res) => {
   try {
-    const reviews = await Review.find({ user: req.user.id }).populate('movie', 'title');
-    res.json(reviews);
+    const userReviews = reviews.filter(r => r.user === req.user.id);
+    res.json(userReviews);
   } catch (err) {
     res.status(400).json({ message: 'Error fetching reviews' });
   }
 });
 
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, (req, res) => {
   try {
-    const review = await Review.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, req.body, { new: true });
+    const review = reviews.find(r => r.id === Number(req.params.id) && r.user === req.user.id);
     if (!review) return res.status(404).json({ message: 'Review not found' });
+    Object.assign(review, req.body);
     res.json(review);
   } catch (err) {
     res.status(400).json({ message: 'Error updating review' });
   }
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', auth, (req, res) => {
   try {
-    const review = await Review.findOneAndDelete({ _id: req.params.id, user: req.user.id });
-    if (!review) return res.status(404).json({ message: 'Review not found' });
+    const idx = reviews.findIndex(r => r.id === Number(req.params.id) && r.user === req.user.id);
+    if (idx === -1) return res.status(404).json({ message: 'Review not found' });
+    reviews.splice(idx, 1);
     res.json({ message: 'Review deleted' });
   } catch (err) {
     res.status(400).json({ message: 'Error deleting review' });

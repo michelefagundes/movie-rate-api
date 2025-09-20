@@ -26,19 +26,20 @@
 
 You can query movies using GraphQL:
 
-1. Start the GraphQL server:
-	```bash
-	node graphql.js
-	```
-2. Go to [http://localhost:4000/graphql](http://localhost:4000/graphql) and use this query:
+1. GraphQL is available together with the REST API:
+	- Just run `npm start` or `node src/index.js`
+2. Go to [http://localhost:3000/graphql](http://localhost:3000/graphql) and use this query:
 	```graphql
-	{
-	  medias {
-		 id
-		 title
-		 description
-	  }
-	}
+		{
+			medias {
+				 id
+				 title
+				 description
+				 genre
+				 releaseDate
+				 type
+			}
+		}
 	```
 
 ## CI Pipeline
